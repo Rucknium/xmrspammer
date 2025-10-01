@@ -47,16 +47,96 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="xmrspammer">xmrspammer<a class="anchor" aria-label="anchor" href="#xmrspammer"></a>
 </h1></div>
-<p><!-- badges: start --> <a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a> <a href="https://github.com/Rucknium/xmrspammer/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Rucknium/xmrspammer/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <!-- badges: end --></p>
+<!-- badges: start -->
+
 <p><code>xmrspammer</code> is an alpha project. Expect breaking changes in future versions.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>Install R. Linux users should install the <code>r-base</code> and <code>r-base-dev</code> system packages.</p>
-<p>You can install the development version of xmrspammer from <a href="https://github.com/" class="external-link">GitHub</a> if you have <code>git</code> and <code>curl</code> installed on your system with:</p>
+<p>You can install the development version of <code>xmrspammer</code> from <a href="https://github.com/Rucknium/xmrspammer" class="external-link">GitHub</a> if you have <code>git</code> and <code>curl</code> installed on your system with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Rucknium/xmrspammer"</span>, upgrade <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="id_-warning-wallets-not-secure">❗❗❗ WARNING: Wallets not secure<a class="anchor" aria-label="anchor" href="#id_-warning-wallets-not-secure"></a>
+</h2>
+<p><code>xmrspammer</code> is intended to be used with valueless testnet coins. The security of the wallet creation and management processes have not been evaluated. If you use <code>xmrspammer</code> on mainnet, your coins could be stolen.</p>
+</div>
+<div class="section level2">
+<h2 id="design">Design<a class="anchor" aria-label="anchor" href="#design"></a>
+</h2>
+<p>The Monero protocol has a few restrictions that make transaction spamming more difficult than, say, bitcoin.</p>
+<p>First is the 16-output limit. The maximum number of outputs that a Monero transaction can have is 16. A single output cannot be as easily split into a very large number of outputs due to this restriction.</p>
+<p>Second is the 10-block lock. Wallets must wait 10 confirmations to spend new outputs.</p>
+<p>A third factor in stressnet testing is the need to fill the stressnet txpool to test node performance when the txpool is large. Transactions cannot be chained together in the txpool (i.e. child transactions cannot spend unconfirmed parent outputs). A wallet needs to have many outputs available to spend so that many of its unconfirmed transactions can wait in the txpool.</p>
+<p>The design of <code>xmrspammer</code> works around these limitations. Wallets are set up to expand a single output into a “tree”. At the end of the process, a wallet will have many “leaves” that contain a single output within an account. From there, the default spamming procedure iterates through each leaf, creating a self-spend transaction back to each leaf.</p>
+<p><code>xmrspammer</code> creates a user-specified number of wallets and boots a <code>monero-wallet-rpc</code> process for each wallet. A <code>monerod</code> Monero node process must be available on the local machine (TODO: allow remote nodes). For each wallet, <code>xmrspammer</code> spawns an R process that runs a spamming loop. The loop instructs each <code>monero-wallet-rpc</code> process to create and broadcast transactions as quickly as possible.</p>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p><code>xmrspammer</code> has only been tested on Linux.</p>
+<p>Users should view coins put into the spamming wallets as unrecoverable. Large amounts of coins should not be put into single spamming wallets because wallets with hundreds of thousands of transactions become slow to produce new transactions. At that point, the wallets should be abandoned and fresh wallets created. TODO: Suggestions for spamming wallet deposit amounts.</p>
+<div class="section level3">
+<h3 id="prerequisites">Prerequisites<a class="anchor" aria-label="anchor" href="#prerequisites"></a>
+</h3>
+<p>You must have a Monero node running locally. It is best to enable the restricted RPC port because connections to the unrestricted RPC port experience performance problems when the txpool is large. You can start your Monero node with the standard testnet restricted RPC port by adding <code>--rpc-restricted-bind-port=28089</code> the flag in your <code>monerod</code> startup command. If you prefer not to enable the restricted RPC port, the <em>unrestricted</em> RPC port for testnet at 28081 is available by default to connections from within your local machine.</p>
+<p>You should have a wallet with some testnet XMR. You will send coins from this wallet to the spamming wallets.</p>
+<p>Starting with a small-scale test wallet can help familiarize users with the process and discover bugs early.</p>
+</div>
+<div class="section level3">
+<h3 id="small-scale-test">Small-scale test<a class="anchor" aria-label="anchor" href="#small-scale-test"></a>
+</h3>
+<p>Start a new R instance in a terminal in an empty working directory. Use <code>screen</code> or another similar program to prevent losing the instance. once you have installed <code>xmrspammer</code>, load the package into the workspace:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
+<p>You must specify the <code>monerod</code> RPC port and the number of spamming wallets to be created. In this example we will assume that you have the node’s restricted RPC port available at 28089. We will create one wallet for this test.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/gen.wallets.html">gen.wallets</a></span><span class="op">(</span>monerod.rpc.port <span class="op">=</span> <span class="fl">28089</span>, n.wallets <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>A single <code>monero-wallet-rpc</code> process should have launched to manage the single wallet we created. Check that the process is alive:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">monero_wallet_rpc_process</span><span class="op">$</span><span class="fu">is_alive</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p>The console should print <code>TRUE</code>.</p>
+<p>Next, we will fund the spamming wallet. <code><a href="reference/fund.wallets.html">fund.wallets()</a></code> is a convenience function that will print the exact command to input into the <code>monero-wallet-cli</code> of the funding wallet. Input the <code>amount</code> argument to specify the total amount of XMR you will send to the spamming wallet(s).</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fund.wallets.html">fund.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, amount <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p>R will print a statement like</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>transfer &lt;address&gt; 1 subtractfeefrom=all</span></code></pre></div>
+<p>Input the statement into <code>monero-wallet-cli</code> and confirm broadcast of the transaction. You will have to wait 10 blocks or about 20 minutes for the outputs of the transaction to be spendable for the next step.</p>
+<p>Now we will create the account leaves of the wallet. This test wallet will use two levels of 16-output transactions. The process will create <code>16^2  = 256</code> leaf accounts. Fee priority will be set to 3 for each level. There are four standard fee tiers: 1, 2, 3, and 4. When the txpool is full, a low-fee transaction could take a long time to confirm, slowing down this step in the process. We will choose fee priority 3 for both tree levels.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prep.leaves.wallets.html">prep.leaves.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, n.outputs <span class="op">=</span> <span class="fl">16</span>,</span>
+<span>  n.tree.levels <span class="op">=</span> <span class="fl">2</span>, fee.priority <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>These transactions should take about 40 minutes (20 blocks) to become spendable.</p>
+<p>At this point we should save the information that our R session has about the wallet so that we could use it later if the R session closes for any reason. We will name the file <code>wallets-test-01.Rdata</code>.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">wallets</span>, file <span class="op">=</span> <span class="st">"wallets-test-01.Rdata"</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, start the spamming. The next line will initiate an infinite loop. Input <code>ctrl + c</code> to interrupt the spamming loop if desired.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/spam.1in.2out.wallets.html">spam.1in.2out.wallets</a></span><span class="op">(</span><span class="va">wallets</span><span class="op">)</span></span></code></pre></div>
+<p>You can check the status of the spamming wallets by starting a new R session in a different terminal window (or a different <code>screen</code> session). You must start the R session in the working directory where you started the original R session. It should have some files and subdirectories by now. Remember to load the package into the workspace:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
+<p>Now load the wallet data into the workspace:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"wallets-test-01.Rdata"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Get some status information about the wallet:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">wallets.status</span><span class="op">(</span><span class="va">wallets</span><span class="op">)</span></span></code></pre></div>
+<p>You may see log messages about insufficient funds for creating new transactions. This test wallet with just 256 leaf accounts probably would have all of its outputs in the txpool or awaiting the 10-block lock.</p>
+</div>
+<div class="section level3">
+<h3 id="large-scale-use">Large-scale use<a class="anchor" aria-label="anchor" href="#large-scale-use"></a>
+</h3>
+<p>TODO</p>
+</div>
+<div class="section level3">
+<h3 id="revive-wallets">Revive wallets<a class="anchor" aria-label="anchor" href="#revive-wallets"></a>
+</h3>
+<p>TODO</p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -82,7 +162,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://github.com/Rucknium/xmrspammer/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Rucknium/xmrspammer/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
