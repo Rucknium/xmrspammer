@@ -8,6 +8,13 @@
 \description{
 Functions for managing Monero wallets to create many transactions in a short period of time. Useful for Monero "stressnet" testing.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://rucknium.github.io/xmrspammer/}
+}
+
+}
 \author{
 \strong{Maintainer}:  Rucknium \email{Rucknium@protonmail.com} (\href{https://orcid.org/0000-0001-5999-8950}{ORCID}) [copyright holder]
 

@@ -232,7 +232,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 16, n.tree.levels =
 #'
 #' @examples
 #' 1
-prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 15, n.tree.levels = 4,
+prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 16, n.tree.levels = 4,
   fee.priority = c(3, 3, 3, 0), wallets.data.file = "spam_wallets_data.rds") {
 
   if (is.na(threads)) { threads <- length(wallets) }
