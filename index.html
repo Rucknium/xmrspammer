@@ -49,6 +49,7 @@
 </h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p><code>xmrspammer</code> is an alpha project. Expect breaking changes in future versions.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -84,12 +85,13 @@
 </h3>
 <p>You must have a Monero node running locally. It is best to enable the restricted RPC port because connections to the unrestricted RPC port experience performance problems when the txpool is large. You can start your Monero node with the standard testnet restricted RPC port by adding <code>--rpc-restricted-bind-port=28089</code> the flag in your <code>monerod</code> startup command. If you prefer not to enable the restricted RPC port, the <em>unrestricted</em> RPC port for testnet at 28081 is available by default to connections from within your local machine.</p>
 <p>You should have a wallet with some testnet XMR. You will send coins from this wallet to the spamming wallets.</p>
+<p>You must create a new empty working directory. Place the correct version of <code>monero-wallet-rpc</code> into the working directory.</p>
 <p>Starting with a small-scale test wallet can help familiarize users with the process and discover bugs early.</p>
 </div>
 <div class="section level3">
 <h3 id="small-scale-test">Small-scale test<a class="anchor" aria-label="anchor" href="#small-scale-test"></a>
 </h3>
-<p>Start a new R instance in a terminal in an empty working directory. Use <code>screen</code> or another similar program to prevent losing the instance. once you have installed <code>xmrspammer</code>, load the package into the workspace:</p>
+<p>Start a new R instance in a terminal in the working directory. Use <code>screen</code> or another similar program to prevent losing the instance. once you have installed <code>xmrspammer</code>, load the package into the workspace:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
 <p>You must specify the <code>monerod</code> RPC port and the number of spamming wallets to be created. In this example we will assume that you have the node’s restricted RPC port available at 28089. We will create one wallet for this test.</p>
