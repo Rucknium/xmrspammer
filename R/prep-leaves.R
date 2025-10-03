@@ -79,8 +79,8 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 16, n.tree.levels =
   stopifnot( length(fee.priority) == n.tree.levels & all(fee.priority %in% 0:4) )
   fee.priority <- as.integer(fee.priority)
 
-  if ( ! n.outputs %in% 2:15) {
-    stop("n.outputs must be an integer between 2 and 15")
+  if ( ! n.outputs %in% 2:16) {
+    stop("n.outputs must be an integer between 2 and 16")
   }
 
   n.final.accounts <- n.outputs^n.tree.levels
