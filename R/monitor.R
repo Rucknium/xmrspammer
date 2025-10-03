@@ -28,12 +28,27 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
 
 
 
-# if restart.alive.processes, then kill process before restarting it
+
+#' Revive wallets processes
+#'
+#' @param monerod.rpc.port monerod.rpc.port
+#' @param wallets.data.file wallets.data.file
+#' @param restart.alive.processes restart.alive.processes
+#' @param print.json print.json
+#' @param cleanup.process.monero_wallet_rpc cleanup.process.monero_wallet_rpc
+#'
+#' @returns
+#' 1
+#' @export
+#'
+#' @examples
+#' 1
 revive.wallets <- function(monerod.rpc.port,
   wallets.data.file = "spam_wallets_data.rds",
   restart.alive.processes = FALSE,
   print.json = FALSE,
   cleanup.process.monero_wallet_rpc = FALSE) {
+  # if restart.alive.processes, then kill process before restarting it
 
   wallets <- readRDS(wallets.data.file)
 
@@ -130,6 +145,18 @@ revive.wallets <- function(monerod.rpc.port,
 
 
 
+#' Check wallets status
+#'
+#' @param wallets wallets
+#' @param get_balance get_balance
+#' @param log.lines log.lines
+#'
+#' @returns
+#' 1
+#' @export
+#'
+#' @examples
+#' 1
 wallets.status <- function(wallets, get_balance = FALSE, log.lines = 2) {
 
   status <- lapply(wallets, function(x) {
