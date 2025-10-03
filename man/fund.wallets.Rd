@@ -4,12 +4,14 @@
 \alias{fund.wallets}
 \title{Fund wallets}
 \usage{
-fund.wallets(x, amount)
+fund.wallets(x, amount, fee.priority = "priority")
 }
 \arguments{
 \item{x}{x}
 
 \item{amount}{amount}
+
+\item{fee.priority}{fee.priority}
 }
 \value{
 1

@@ -491,6 +491,7 @@ gen.wallets <- function(monerod.rpc.port,
 #'
 #' @param x x
 #' @param amount amount
+#' @param fee.priority fee.priority
 #'
 #' @returns
 #' 1
@@ -498,7 +499,7 @@ gen.wallets <- function(monerod.rpc.port,
 #'
 #' @examples
 #' 1
-fund.wallets <- function(x, amount) {
+fund.wallets <- function(x, amount, fee.priority = "priority") {
 
   if ( ! ( inherits(x, "wallets") | inherits(x, "character") ) ) {
     stop("x input is of incorrect class")
@@ -517,7 +518,7 @@ fund.wallets <- function(x, amount) {
     addresses <- x
   }
 
-  command <- paste0("transfer ",
+  command <- paste0("transfer ", fee.priority, " ",
     paste0(addresses, " ", amount.each, collapse = " "), " subtractfeefrom=all")
   # https://monero.stackexchange.com/questions/4021/how-do-i-send-xmr-to-multiple-different-addresses
   # subtractfeefrom feature:
