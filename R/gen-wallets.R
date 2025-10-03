@@ -437,7 +437,7 @@ gen.wallets <- function(monerod.rpc.port,
     xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
         wallets[[id]][["monero_wallet_rpc_port"]], "/json_rpc"),
       method = "set_subaddress_lookahead",
-      params = list(major_idx = "50", minor_idx = "2"))
+      params = list(major_idx = 50L, minor_idx = 2L))
     # Setting minor_idx to a low value reduces unnecessary workload
     # https://github.com/monero-project/monero/pull/9953
 
