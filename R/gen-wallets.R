@@ -378,6 +378,10 @@ gen.wallets <- function(monerod.rpc.port,
 
   stopifnot(length(n.wallets) == 1 && is.numeric(n.wallets) && n.wallets > 0)
 
+  if ( ! file.exists("monero-wallet-rpc") ) {
+    stop("monero-wallet-rpc binary not in current working directory.")
+  }
+
   wallets <- vector("list", n.wallets)
 
   for (id in seq_len(n.wallets)) {
