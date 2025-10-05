@@ -93,7 +93,7 @@
 <div class="section level3">
 <h3 id="small-scale-test">Small-scale test<a class="anchor" aria-label="anchor" href="#small-scale-test"></a>
 </h3>
-<p>Start a new R instance in a terminal in the working directory. Use <code>screen</code> or another similar program to prevent losing the instance. once you have installed <code>xmrspammer</code>, load the package into the workspace:</p>
+<p>Start a new R instance in a terminal in the working directory. Use <code>screen</code> or another similar program to prevent losing the instance. Once you have installed <code>xmrspammer</code>, load the package into the workspace:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
 <p>You must specify the <code>monerod</code> RPC port and the number of spamming wallets to be created. In this example we will assume that you have the node’s restricted RPC port available at 28089. We will create one wallet for this test.</p>
@@ -105,31 +105,28 @@
 <p>The console should print <code>TRUE</code>.</p>
 <p>Next, we will fund the spamming wallet. <code><a href="reference/fund.wallets.html">fund.wallets()</a></code> is a convenience function that will print the exact command to input into the <code>monero-wallet-cli</code> of the funding wallet. Input the <code>amount</code> argument to specify the total amount of XMR you will send to the spamming wallet(s).</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/fund.wallets.html">fund.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, amount <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/fund.wallets.html">fund.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, amount <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span></code></pre></div>
 <p>R will print a statement like</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>transfer &lt;address&gt; 1 subtractfeefrom=all</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode txt"><code class="sourceCode default"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>transfer priority &lt;address&gt; 30 subtractfeefrom=all</span></code></pre></div>
 <p>Input the statement into <code>monero-wallet-cli</code> and confirm broadcast of the transaction. You will have to wait 10 blocks or about 20 minutes for the outputs of the transaction to be spendable for the next step.</p>
-<p>Now we will create the account leaves of the wallet. This test wallet will use two levels of 16-output transactions. The process will create <code>16^2  = 256</code> leaf accounts. Fee priority will be set to 3 for each level. There are four standard fee tiers: 1, 2, 3, and 4. When the txpool is full, a low-fee transaction could take a long time to confirm, slowing down this step in the process. We will choose fee priority 3 for both tree levels.</p>
+<p>Now we will create the account leaves of the wallet. This test wallet will use three levels of 15-output transactions. The process will create <code>15^3  = 3375</code> leaf accounts. Fee priority will be set to 4 for each level. There are four standard fee tiers: 1, 2, 3, and 4. When the txpool is full, a low-fee transaction could take a long time to confirm, slowing down this step in the process. We will choose fee priority 4 for all tree levels so that the accounts are built as quickly as possible.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prep.leaves.wallets.html">prep.leaves.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, n.outputs <span class="op">=</span> <span class="fl">16</span>,</span>
-<span>  n.tree.levels <span class="op">=</span> <span class="fl">2</span>, fee.priority <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>These transactions should take about 40 minutes (20 blocks) to become spendable.</p>
-<p>At this point we should save the information that our R session has about the wallet so that we could use it later if the R session closes for any reason. We will name the file <code>wallets-test-01.Rdata</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/save.html" class="external-link">save</a></span><span class="op">(</span><span class="va">wallets</span>, file <span class="op">=</span> <span class="st">"wallets-test-01.Rdata"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/prep.leaves.wallets.html">prep.leaves.wallets</a></span><span class="op">(</span><span class="va">wallets</span>, n.outputs <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  n.tree.levels <span class="op">=</span> <span class="fl">3</span>, fee.priority <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>, <span class="fl">4</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>These transactions should take about 60 minutes (30 blocks) to become spendable.</p>
 <p>Finally, start the spamming. The next line will initiate an infinite loop. Input <code>ctrl + c</code> to interrupt the spamming loop if desired.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/spam.1in.2out.wallets.html">spam.1in.2out.wallets</a></span><span class="op">(</span><span class="va">wallets</span><span class="op">)</span></span></code></pre></div>
 <p>You can check the status of the spamming wallets by starting a new R session in a different terminal window (or a different <code>screen</code> session). You must start the R session in the working directory where you started the original R session. It should have some files and subdirectories by now. Remember to load the package into the workspace:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
 <p>Now load the wallet data into the workspace:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="st">"wallets-test-01.Rdata"</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"spam_wallets_data.rds"</span><span class="op">)</span></span></code></pre></div>
 <p>Get some status information about the wallet:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/wallets.status.html">wallets.status</a></span><span class="op">(</span><span class="va">wallets</span><span class="op">)</span></span></code></pre></div>
-<p>You may see log messages about insufficient funds for creating new transactions. This test wallet with just 256 leaf accounts probably would have all of its outputs in the txpool or awaiting the 10-block lock.</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/wallets.status.html">wallets.status</a></span><span class="op">(</span><span class="va">wallets</span>, get_balance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>Ignore the message about the RPC process being dead. You may see log messages about insufficient funds for creating new transactions. When the txpool is large, there will be many transactions in the queue in front of yours, so you may have all of your accounts with transactions waiting in the txpool.</p>
 </div>
 <div class="section level3">
 <h3 id="large-scale-use">Large-scale use<a class="anchor" aria-label="anchor" href="#large-scale-use"></a>
