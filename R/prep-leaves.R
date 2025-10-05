@@ -70,8 +70,8 @@ gen.account.tree.level <- function(wallet_rpc_port, transfer.tree, n.outputs,
 
 
 
-prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 16, n.tree.levels = 4,
-  fee.priority = c(3, 3, 3, 0), handle = RCurl::getCurlHandle()) {
+prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels = 3,
+  fee.priority = c(4, 4, 4), handle = RCurl::getCurlHandle()) {
 
   wallet_rpc_port <- wallet[["monero_wallet_rpc_port"]]
   wallet_dir <- wallet[["wallet_dir"]]
@@ -79,8 +79,8 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 16, n.tree.levels =
   stopifnot( length(fee.priority) == n.tree.levels & all(fee.priority %in% 0:4) )
   fee.priority <- as.integer(fee.priority)
 
-  if ( ! n.outputs %in% 2:16) {
-    stop("n.outputs must be an integer between 2 and 16")
+  if ( ! n.outputs %in% 2:15) {
+    stop("n.outputs must be an integer between 2 and 15")
   }
 
   n.final.accounts <- n.outputs^n.tree.levels
@@ -232,7 +232,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 16, n.tree.levels =
 #'
 #' @examples
 #' 1
-prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 16, n.tree.levels = 4,
+prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 15, n.tree.levels = 4,
   fee.priority = c(3, 3, 3, 0), wallets.data.file = "spam_wallets_data.rds") {
 
   if (is.na(threads)) { threads <- length(wallets) }

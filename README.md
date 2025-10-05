@@ -55,7 +55,7 @@ Starting with a small-scale test wallet can help familiarize users with the proc
 
 ### Small-scale test
 
-Start a new R instance in a terminal in the working directory. Use `screen` or another similar program to prevent losing the instance. once you have installed `xmrspammer`, load the package into the workspace:
+Start a new R instance in a terminal in the working directory. Use `screen` or another similar program to prevent losing the instance. Once you have installed `xmrspammer`, load the package into the workspace:
 
 ``` r
 library(xmrspammer)
@@ -78,31 +78,25 @@ The console should print `TRUE`.
 Next, we will fund the spamming wallet. `fund.wallets()` is a convenience function that will print the exact command to input into the `monero-wallet-cli` of the funding wallet. Input the `amount` argument to specify the total amount of XMR you will send to the spamming wallet(s).
 
 ``` r
-fund.wallets(wallets, amount = 1)
+fund.wallets(wallets, amount = 30)
 ```
 
 R will print a statement like
 
 ``` txt
-transfer <address> 1 subtractfeefrom=all
+transfer priority <address> 30 subtractfeefrom=all
 ```
 
 Input the statement into `monero-wallet-cli` and confirm broadcast of the transaction. You will have to wait 10 blocks or about 20 minutes for the outputs of the transaction to be spendable for the next step.
 
-Now we will create the account leaves of the wallet. This test wallet will use two levels of 16-output transactions. The process will create `16^2  = 256` leaf accounts. Fee priority will be set to 3 for each level. There are four standard fee tiers: 1, 2, 3, and 4. When the txpool is full, a low-fee transaction could take a long time to confirm, slowing down this step in the process. We will choose fee priority 3 for both tree levels.
+Now we will create the account leaves of the wallet. This test wallet will use three levels of 15-output transactions. The process will create `15^3  = 3375` leaf accounts. Fee priority will be set to 4 for each level. There are four standard fee tiers: 1, 2, 3, and 4. When the txpool is full, a low-fee transaction could take a long time to confirm, slowing down this step in the process. We will choose fee priority 4 for all tree levels so that the accounts are built as quickly as possible.
 
 ``` r
-wallets <- prep.leaves.wallets(wallets, n.outputs = 16,
-  n.tree.levels = 2, fee.priority = c(3, 3))
+wallets <- prep.leaves.wallets(wallets, n.outputs = 15,
+  n.tree.levels = 3, fee.priority = c(4, 4, 4))
 ```
 
-These transactions should take about 40 minutes (20 blocks) to become spendable.
-
-At this point we should save the information that our R session has about the wallet so that we could use it later if the R session closes for any reason. We will name the file `wallets-test-01.Rdata`.
-
-``` r
-save(wallets, file = "wallets-test-01.Rdata")
-```
+These transactions should take about 60 minutes (30 blocks) to become spendable.
 
 Finally, start the spamming. The next line will initiate an infinite loop. Input `ctrl + c` to interrupt the spamming loop if desired.
 
@@ -119,16 +113,16 @@ library(xmrspammer)
 Now load the wallet data into the workspace:
 
 ``` r
-load("wallets-test-01.Rdata", verbose = TRUE)
+wallets <- readRDS("spam_wallets_data.rds")
 ```
 
 Get some status information about the wallet:
 
 ``` r
-wallets.status(wallets)
+wallets.status(wallets, get_balance = TRUE)
 ```
 
-You may see log messages about insufficient funds for creating new transactions. This test wallet with just 256 leaf accounts probably would have all of its outputs in the txpool or awaiting the 10-block lock.
+Ignore the message about the RPC process being dead. You may see log messages about insufficient funds for creating new transactions. When the txpool is large, there will be many transactions in the queue in front of yours, so you may have all of your accounts with transactions waiting in the txpool.
 
 ### Large-scale use
 

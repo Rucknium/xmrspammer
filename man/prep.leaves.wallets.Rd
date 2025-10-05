@@ -7,7 +7,7 @@
 prep.leaves.wallets(
   wallets,
   threads = NA,
-  n.outputs = 16,
+  n.outputs = 15,
   n.tree.levels = 4,
   fee.priority = c(3, 3, 3, 0),
   wallets.data.file = "spam_wallets_data.rds"
