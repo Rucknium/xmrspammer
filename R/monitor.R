@@ -12,12 +12,15 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
   monero.wallet.rpc.height <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
     monero.wallet.rpc.port, "/json_rpc"),
     method = "get_height",
-    params = list())$result$height
+    params = list())$result["height"]
 
   stopifnot(length(monero.wallet.rpc.height) > 0)
 
-  c(monerod.height = monerod.height,
-    monero.wallet.rpc.height = monero.wallet.rpc.height)
+  result <- as.numeric(c(monerod.height, monero.wallet.rpc.height))
+
+  names(result) <- c("monerod.height", "monero.wallet.rpc.height")
+
+  result
 
 }
 
@@ -52,6 +55,9 @@ revive.wallets <- function(monerod.rpc.port,
 
   wallets <- readRDS(wallets.data.file)
 
+  monero_wallet_rpc.binary <- ifelse(.Platform$OS.type == "windows",
+    "monero-wallet-rpc.exe", "./monero-wallet-rpc")
+
   for (id in seq_along(wallets)) {
 
     pid <- wallets[[id]]$monero_wallet_rpc_pid
@@ -83,7 +89,7 @@ revive.wallets <- function(monerod.rpc.port,
     )
     # Separate args into elements in a vector. No spaces. Use "=" instead of space.
 
-    monero.wallet.rpc.process <- processx::process$new("./monero-wallet-rpc",
+    monero.wallet.rpc.process <- processx::process$new(monero_wallet_rpc.binary,
       monero.wallet.rpc.startup.flags, cleanup = cleanup.process.monero_wallet_rpc)
 
     wallets[[id]][["monero_wallet_rpc_process"]] <-
@@ -107,7 +113,7 @@ revive.wallets <- function(monerod.rpc.port,
 
       heights <- compare.heights(monerod.rpc.port, wallets[[id]][["monero_wallet_rpc_port"]])
 
-      cat(paste0(base::date(), "Wallet ", formatC(id, width = 3),
+      cat(paste0(base::date(), " Wallet ", formatC(id, width = 3),
         " sync height: ",
         heights["monero.wallet.rpc.height"], "/", heights["monerod.height"], "\n"))
 
