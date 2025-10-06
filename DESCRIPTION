@@ -1,7 +1,7 @@
 Package: xmrspammer
 Type: Package
 Title: Create high volume of spam Monero transactions
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
     person(
       family = "Rucknium",
