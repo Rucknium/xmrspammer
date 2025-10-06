@@ -47,7 +47,7 @@ xmr.rpc <- function(
   }
 
   if (is.null(rcp.ret)) {
-    stop("Cannot connect to monerod. Is monerod running?")
+    stop(paste0("Cannot connect to ", url.rpc, "  Is the process running?"))
   }
 
   if (num.as.string) {
@@ -92,10 +92,10 @@ restore_deterministic_wallet <- function(wallet_rpc_port, wallet_id, seed, resto
 }
 
 
-save_wallet <- function(wallet_rpc_port) {
+save_wallet <- function(wallet_rpc_port, handle = RCurl::getCurlHandle()) {
   # Save wallet file to storage
   xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
-    method = "store", params = list())
+    method = "store", params = list(), handle = handle)
 }
 
 

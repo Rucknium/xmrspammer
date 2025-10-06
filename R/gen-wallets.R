@@ -412,6 +412,9 @@ gen.wallets <- function(monerod.rpc.port,
       paste0("--wallet-dir=", wallets[[id]][["wallet_dir"]]),
       paste0("--daemon-address=", "127.0.0.1:", monerod.rpc.port),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
+      paste0("--rpc-max-connections=", "1000"),
+      paste0("--rpc-max-connections-per-public-ip=", "1000"),
+      paste0("--rpc-max-connections-per-private-ip=", "1000"),
       "--trusted-daemon", "--disable-rpc-ban", "--disable-rpc-login"
     )
     # Separate args into elements in a vector. No spaces. Use "=" instead of space.

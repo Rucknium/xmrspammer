@@ -63,7 +63,7 @@ gen.account.tree.level <- function(wallet_rpc_port, transfer.tree, n.outputs,
 
   }
 
-  save_wallet(wallet_rpc_port)
+  save_wallet(wallet_rpc_port, handle = handle)
 
   return(invisible(NULL))
 

@@ -45,7 +45,7 @@ Users should view coins put into the spamming wallets as unrecoverable. Large am
 
 ### Prerequisites
 
-1.  You must have a Monero node running locally. It is best to enable the restricted RPC port because connections to the unrestricted RPC port experience performance problems when the txpool is large. You can start your Monero node with the standard testnet restricted RPC port by adding `--rpc-restricted-bind-port=28089` the flag in your `monerod` startup command. If you prefer not to enable the restricted RPC port, the *unrestricted* RPC port for testnet at 28081 is available by default to connections from within your local machine.
+1.  You must have a Monero node running locally. It is best to enable the restricted RPC port because connections to the unrestricted RPC port experience performance problems when the txpool is large. You can start your Monero node with the standard testnet restricted RPC port by adding `--rpc-restricted-bind-port=28089` the flag in your `monerod` startup command. If you prefer not to enable the restricted RPC port, the *unrestricted* RPC port for testnet at 28081 is available by default to connections from within your local machine. For a smooth connection experience, also add `--rpc-max-connections=1000`, `--rpc-max-connections-per-public-ip=1000` and `--rpc-max-connections-per-private-ip=1000` as startup flags.
 
 2.  You should have a wallet with some testnet XMR. You will send coins from this wallet to the spamming wallets.
 

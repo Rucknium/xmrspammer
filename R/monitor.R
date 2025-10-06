@@ -2,17 +2,19 @@
 # monitor
 
 
-compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
+compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port,
+  monerod.handle, wallet.handle) {
 
   monerod.height <- xmr.rpc(paste0("http://127.0.0.1:", monerod.rpc.port, "/json_rpc"),
-    method = "get_last_block_header")$result$block_header$height
+    method = "get_last_block_header", handle = monerod.handle)$result$block_header$height
 
   stopifnot(length(monerod.height) > 0)
 
   monero.wallet.rpc.height <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
     monero.wallet.rpc.port, "/json_rpc"),
     method = "get_height",
-    params = list())$result["height"]
+    params = list(),
+    handle = wallet.handle)$result["height"]
 
   stopifnot(length(monero.wallet.rpc.height) > 0)
 
@@ -86,6 +88,9 @@ revive.wallets <- function(monerod.rpc.port,
       paste0("--wallet-file=", wallets[[id]][["wallet_dir"]], "/spam_wallet"),
       paste0("--daemon-address=", "127.0.0.1:", monerod.rpc.port),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
+      paste0("--rpc-max-connections=", "1000"),
+      paste0("--rpc-max-connections-per-public-ip=", "1000"),
+      paste0("--rpc-max-connections-per-private-ip=", "1000"),
       "--password=password",
       "--trusted-daemon", "--disable-rpc-ban", "--disable-rpc-login"
     )
@@ -108,12 +113,16 @@ revive.wallets <- function(monerod.rpc.port,
   Sys.sleep(10)
 
   wallets.synced <- rep(FALSE, length(wallets))
+  wallets.handles <- replicate(length(wallets), RCurl::getCurlHandle())
+  # May need "replicate" instead of "rep" because this causes handle creation
+  monerod.handle <- RCurl::getCurlHandle()
 
   while( ! all(wallets.synced) ) {
 
     for (id in seq_along(wallets)) {
 
-      heights <- compare.heights(monerod.rpc.port, wallets[[id]][["monero_wallet_rpc_port"]])
+      heights <- compare.heights(monerod.rpc.port, wallets[[id]][["monero_wallet_rpc_port"]],
+        monerod.handle = monerod.handle, wallet.handle = wallets.handles[[id]])
 
       cat(paste0(base::date(), " Wallet ", formatC(id, width = 3),
         " sync height: ",

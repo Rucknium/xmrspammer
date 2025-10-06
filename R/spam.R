@@ -64,7 +64,7 @@ spam.1in.2out <- function(wallet, fee.priority = 1,
       cat(base::date(), "Sleep 30 seconds\n", file = paste0(wallet_dir, "/R.log"), append = TRUE)
       Sys.sleep(30)
       # Give time to propagate blocks and/or txs to peers
-      save_wallet(monero_wallet_rpc_port)
+      save_wallet(monero_wallet_rpc_port, handle = handle)
       # Save wallet to storage
     }
 
