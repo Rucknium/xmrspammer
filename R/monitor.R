@@ -16,10 +16,11 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
 
   stopifnot(length(monero.wallet.rpc.height) > 0)
 
-  as.numeric(
-    c(monerod.height = monerod.height,
-      monero.wallet.rpc.height = monero.wallet.rpc.height)
-  )
+  result <- as.numeric(c(monerod.height, monero.wallet.rpc.height))
+
+  names(result) <- c("monerod.height", "monero.wallet.rpc.height")
+
+  result
 
 }
 
@@ -112,7 +113,7 @@ revive.wallets <- function(monerod.rpc.port,
 
       heights <- compare.heights(monerod.rpc.port, wallets[[id]][["monero_wallet_rpc_port"]])
 
-      cat(paste0(base::date(), "Wallet ", formatC(id, width = 3),
+      cat(paste0(base::date(), " Wallet ", formatC(id, width = 3),
         " sync height: ",
         heights["monero.wallet.rpc.height"], "/", heights["monerod.height"], "\n"))
 
