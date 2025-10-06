@@ -12,7 +12,7 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
   monero.wallet.rpc.height <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
     monero.wallet.rpc.port, "/json_rpc"),
     method = "get_height",
-    params = list())$result$height
+    params = list())$result["height"]
 
   stopifnot(length(monero.wallet.rpc.height) > 0)
 
