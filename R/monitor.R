@@ -16,8 +16,10 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port) {
 
   stopifnot(length(monero.wallet.rpc.height) > 0)
 
-  c(monerod.height = monerod.height,
-    monero.wallet.rpc.height = monero.wallet.rpc.height)
+  as.numeric(
+    c(monerod.height = monerod.height,
+      monero.wallet.rpc.height = monero.wallet.rpc.height)
+  )
 
 }
 
