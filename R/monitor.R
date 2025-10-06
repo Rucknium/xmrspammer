@@ -52,6 +52,9 @@ revive.wallets <- function(monerod.rpc.port,
 
   wallets <- readRDS(wallets.data.file)
 
+  monero_wallet_rpc.binary <- ifelse(.Platform$OS.type == "windows",
+    "monero-wallet-rpc.exe", "./monero-wallet-rpc")
+
   for (id in seq_along(wallets)) {
 
     pid <- wallets[[id]]$monero_wallet_rpc_pid
@@ -83,7 +86,7 @@ revive.wallets <- function(monerod.rpc.port,
     )
     # Separate args into elements in a vector. No spaces. Use "=" instead of space.
 
-    monero.wallet.rpc.process <- processx::process$new("./monero-wallet-rpc",
+    monero.wallet.rpc.process <- processx::process$new(monero_wallet_rpc.binary,
       monero.wallet.rpc.startup.flags, cleanup = cleanup.process.monero_wallet_rpc)
 
     wallets[[id]][["monero_wallet_rpc_process"]] <-

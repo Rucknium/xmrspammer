@@ -378,7 +378,10 @@ gen.wallets <- function(monerod.rpc.port,
 
   stopifnot(length(n.wallets) == 1 && is.numeric(n.wallets) && n.wallets > 0)
 
-  if ( ! file.exists("monero-wallet-rpc") ) {
+  monero_wallet_rpc.binary <- ifelse(.Platform$OS.type == "windows",
+    "monero-wallet-rpc.exe", "./monero-wallet-rpc")
+
+  if ( ! (file.exists("monero-wallet-rpc") | file.exists("monero-wallet-rpc.exe") ) ) {
     stop("monero-wallet-rpc binary not in current working directory.")
   }
 
@@ -413,7 +416,7 @@ gen.wallets <- function(monerod.rpc.port,
     )
     # Separate args into elements in a vector. No spaces. Use "=" instead of space.
 
-    monero.wallet.rpc.process <- processx::process$new("./monero-wallet-rpc",
+    monero.wallet.rpc.process <- processx::process$new(monero_wallet_rpc.binary,
       monero.wallet.rpc.startup.flags, cleanup = cleanup.process.monero_wallet_rpc)
     # Note: No space after command or it will error
 
