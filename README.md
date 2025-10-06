@@ -130,4 +130,39 @@ TODO
 
 ### Revive wallets
 
-TODO
+You may need to close the R session you used to generate the wallets and/or shut down your machine. Or one or more `monero-wallet-rpc` processes may have spontaneously quit. The `revive.wallets()` function can bring the wallets back under your control in a new R session.
+
+First, make sure that no other R sessions with the wallets are open.
+
+Open a new R session in the directory where the wallet files are located. Load the package:
+
+``` r
+library(xmrspammer)
+```
+
+Then use the `revive.wallets()` function to gain control of the wallets:
+
+``` r
+wallets <- revive.wallets(monerod.rpc.port = 28089)
+```
+
+If `28089` is not your `monerod`'s RPC port, change it.
+
+You can check the wallet status:
+
+``` r
+wallets.status(wallets, get_balance = TRUE)
+```
+
+And start spamming again:
+
+``` r
+spam.1in.2out.wallets(wallets)
+```
+
+`revive.wallets()` will launch new `monero-wallet-rpc` processes if the ones you launched before had quit. By default, `revive.wallets()` will just connect to an existing `monero-wallet-rpc` process if one is already running. To quit all `monero-wallet-rpc` processes and restart a fresh `monero-wallet-rpc` process for every wallet, input this:
+
+``` r
+wallets <- revive.wallets(monerod.rpc.port = 28089,
+  restart.alive.processes = TRUE)
+```
