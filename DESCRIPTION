@@ -21,9 +21,11 @@ Imports:
     digest,
     future,
     future.apply,
+    LaF,
     openssl,
     parallelly,
     processx,
+    ps,
     RCurl,
     RJSONIO
 URL: https://rucknium.github.io/xmrspammer/

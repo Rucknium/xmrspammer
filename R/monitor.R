@@ -61,13 +61,15 @@ revive.wallets <- function(monerod.rpc.port,
   for (id in seq_along(wallets)) {
 
     pid <- wallets[[id]]$monero_wallet_rpc_pid
-    pid.command <- system(paste0("ps -p ", pid, " -o command"), intern = TRUE)
+    pid.handle <- tryCatch(ps::ps_handle(pid), error = function(e) NULL)
 
     # Check if the process is still running and it was actually an
     # instance of monero-wallet-rpc
-    if ( any(grepl("monero-wallet-rpc", pid.command)) ) {
+    if ( length(pid.handle) > 0 && grepl("monero-wallet-rpc", ps::ps_name(pid.handle)) ) {
       if (restart.alive.processes) {
-        system(paste0("kill -9 ", pid))
+        ps::ps_kill(pid.handle)
+        Sys.sleep(5)
+        # Sleep so that the process has time to be killed
       } else {
         next
         # If the process is already running and we do not
@@ -170,8 +172,9 @@ wallets.status <- function(wallets, get_balance = FALSE, log.lines = 2) {
     alive <- x$monero_wallet_rpc_process$is_alive()
 
     R.log.file <- paste0(x[["wallet_dir"]], "/R.log")
-
-    log.text <- system(paste0("tail -n ", log.lines, " ", R.log.file), intern = TRUE)
+    total.log.n.lines <- LaF::determine_nlines(R.log.file)
+    log.text <- LaF::get_lines(R.log.file,
+      (total.log.n.lines - log.lines + 1):total.log.n.lines)
 
     if (get_balance) {
       balance <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
@@ -215,7 +218,7 @@ wallets.status <- function(wallets, get_balance = FALSE, log.lines = 2) {
       cat("\tTotal wallet balance: ",
         status[[id]]$balance.data$total.balance, "\n", sep = "")
       cat("Summary stats of balances of ", status[[id]]$balance.data$n.accounts,
-        " wallet accounts:\n\t", sep = "")
+        " wallet accounts:\n", sep = "")
       print(status[[id]]$balance.data$per_account.summary)
     }
     cat("\n")
