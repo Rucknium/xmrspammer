@@ -136,7 +136,25 @@
 <div class="section level3">
 <h3 id="revive-wallets">Revive wallets<a class="anchor" aria-label="anchor" href="#revive-wallets"></a>
 </h3>
-<p>TODO</p>
+<p>You may need to close the R session you used to generate the wallets and/or shut down your machine. Or one or more <code>monero-wallet-rpc</code> processes may have spontaneously quit. The <code><a href="reference/revive.wallets.html">revive.wallets()</a></code> function can bring the wallets back under your control in a new R session.</p>
+<p>First, make sure that no other R sessions with the wallets are open.</p>
+<p>Open a new R session in the directory where the wallet files are located. Load the package:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rucknium.github.io/xmrspammer/">xmrspammer</a></span><span class="op">)</span></span></code></pre></div>
+<p>Then use the <code><a href="reference/revive.wallets.html">revive.wallets()</a></code> function to gain control of the wallets:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/revive.wallets.html">revive.wallets</a></span><span class="op">(</span>monerod.rpc.port <span class="op">=</span> <span class="fl">28089</span><span class="op">)</span></span></code></pre></div>
+<p>If <code>28089</code> is not your <code>monerod</code>’s RPC port, change it.</p>
+<p>You can check the wallet status:</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/wallets.status.html">wallets.status</a></span><span class="op">(</span><span class="va">wallets</span>, get_balance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>And start spamming again:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/spam.1in.2out.wallets.html">spam.1in.2out.wallets</a></span><span class="op">(</span><span class="va">wallets</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="reference/revive.wallets.html">revive.wallets()</a></code> will launch new <code>monero-wallet-rpc</code> processes if the ones you launched before had quit. By default, <code><a href="reference/revive.wallets.html">revive.wallets()</a></code> will just connect to an existing <code>monero-wallet-rpc</code> process if one is already running. To quit all <code>monero-wallet-rpc</code> processes and restart a fresh <code>monero-wallet-rpc</code> process for every wallet, input this:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">wallets</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/revive.wallets.html">revive.wallets</a></span><span class="op">(</span>monerod.rpc.port <span class="op">=</span> <span class="fl">28089</span>,</span>
+<span>  restart.alive.processes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 </div>
