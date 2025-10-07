@@ -34,7 +34,7 @@ gen.account.tree.level <- function(wallet_rpc_port, transfer.tree, n.outputs,
     }
     params = list(destinations = destinations, account_index = as.numeric(i), priority = priority,
       subtract_fee_from_outputs = seq_along(to_addresses) - 1L)
-    transfer.result <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+    transfer.result <- xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
       method = "transfer", params = params, keep.trying.rpc = TRUE, handle = handle)
     # Use keep.trying.rpc = TRUE because we assume that a truly unreachable RPC
     # would have been caught in an earlier RPC call.
@@ -108,7 +108,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
 
 
   # MUST DO THIS WHEN STARTING NEW WALLET:
-  xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+  xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
     method = "label_account",
     params = list(account_index = 0L, label = unique.tree.accounts[1]),
     handle = handle)
@@ -128,7 +128,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
 
 
   for (i in setdiff(unique.tree.accounts, existing.accounts)) {
-    new_account <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+    new_account <- xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
       method = "create_account", params = list(label = i), keep.trying.rpc = TRUE, handle = handle)
     # Use keep.trying.rpc = TRUE because we assume that a truly unreachable RPC
     # would have been caught in an earlier RPC call.

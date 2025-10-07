@@ -393,7 +393,7 @@ gen.wallets <- function(monerod.rpc.port,
 
     wallets[[id]][["mnemonic_seed"]] <- gen.mnemonic.seed()
 
-    current.height <- xmr.rpc(paste0("http://127.0.0.1:", monerod.rpc.port, "/json_rpc"),
+    current.height <- xmr.rpc(paste0(parse.url.port(monerod.rpc.port), "/json_rpc"),
       method = "get_last_block_header")$result$block_header$height
 
     stopifnot(length(current.height) > 0)
@@ -410,7 +410,7 @@ gen.wallets <- function(monerod.rpc.port,
       "--testnet",
       paste0("--rpc-bind-port=", wallets[[id]][["monero_wallet_rpc_port"]]),
       paste0("--wallet-dir=", wallets[[id]][["wallet_dir"]]),
-      paste0("--daemon-address=", "127.0.0.1:", monerod.rpc.port),
+      paste0("--daemon-address=", parse.url.port(monerod.rpc.port, rm.http.prefix = TRUE) ),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
       paste0("--rpc-max-connections=", "1000"),
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
@@ -440,8 +440,8 @@ gen.wallets <- function(monerod.rpc.port,
     wallets[[id]][["primary_address"]] <-
       restore_deterministic_wallet.output$result$address
 
-    xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
-        wallets[[id]][["monero_wallet_rpc_port"]], "/json_rpc"),
+    xmr.rpc(url.rpc = paste0(
+      parse.url.port(wallets[[id]][["monero_wallet_rpc_port"]]), "/json_rpc"),
       method = "set_subaddress_lookahead",
       params = list(major_idx = 50L, minor_idx = 2L))
     # Setting minor_idx to a low value reduces unnecessary workload

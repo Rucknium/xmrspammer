@@ -5,13 +5,13 @@
 compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port,
   monerod.handle, wallet.handle) {
 
-  monerod.height <- xmr.rpc(paste0("http://127.0.0.1:", monerod.rpc.port, "/json_rpc"),
+  monerod.height <- xmr.rpc(paste0(parse.url.port(monerod.rpc.port), "/json_rpc"),
     method = "get_last_block_header", handle = monerod.handle)$result$block_header$height
 
   stopifnot(length(monerod.height) > 0)
 
-  monero.wallet.rpc.height <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
-    monero.wallet.rpc.port, "/json_rpc"),
+  monero.wallet.rpc.height <- xmr.rpc(url.rpc = paste0(
+    parse.url.port(monero.wallet.rpc.port), "/json_rpc"),
     method = "get_height",
     params = list(),
     handle = wallet.handle)$result["height"]
@@ -86,7 +86,7 @@ revive.wallets <- function(monerod.rpc.port,
       "--testnet",
       paste0("--rpc-bind-port=", wallets[[id]][["monero_wallet_rpc_port"]]),
       paste0("--wallet-file=", wallets[[id]][["wallet_dir"]], "/spam_wallet"),
-      paste0("--daemon-address=", "127.0.0.1:", monerod.rpc.port),
+      paste0("--daemon-address=", parse.url.port(monerod.rpc.port, rm.http.prefix = TRUE) ),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
       paste0("--rpc-max-connections=", "1000"),
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
@@ -186,8 +186,8 @@ wallets.status <- function(wallets, get_balance = FALSE, log.lines = 2) {
       (total.log.n.lines - log.lines + 1):total.log.n.lines)
 
     if (get_balance) {
-      balance <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:",
-        x[["monero_wallet_rpc_port"]], "/json_rpc"),
+      balance <- xmr.rpc(url.rpc = paste0(
+        parse.url.port(x[["monero_wallet_rpc_port"]]), "/json_rpc"),
         method = "get_balance",
         params = list(account_index = 0L, all_accounts = TRUE))$result
 

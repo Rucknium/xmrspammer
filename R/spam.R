@@ -21,7 +21,7 @@ spam.1in.2out <- function(wallet, fee.priority = 1,
 
   while (TRUE) {
 
-    sweep.result <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:", monero_wallet_rpc_port, "/json_rpc"),
+    sweep.result <- xmr.rpc(paste0(parse.url.port(monero_wallet_rpc_port), "/json_rpc"),
       method = "sweep_all", params = list(address = leaf_accounts[row.iter, base_address],
         account_index = leaf_accounts[row.iter, as.numeric(account_index)], priority = priority),
       keep.trying.rpc = TRUE, handle = handle)

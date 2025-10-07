@@ -1,5 +1,20 @@
 
 
+parse.url.port <- function(x, rm.http.prefix = FALSE) {
+  if (is.numeric(x)) {
+    # Assume local URL
+    return(paste0("http://127.0.0.1:", x))
+  }
+  pattern <- "^http[s]?://[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}:[0-9]+$"
+  if (grepl(pattern, x)) {
+    if (rm.http.prefix) {
+      x <- gsub("^http[s]?://", "", x)
+    }
+    return(x)
+  }
+  stop("Input must be a numeric port like 99999 or a URL with port like http://999.999.999.999:99999")
+}
+
 
 # Modified from TownforgeR::tf_rpc_curl function
 xmr.rpc <- function(
@@ -63,7 +78,7 @@ xmr.rpc <- function(
 
 
 get_accounts <- function(wallet_rpc_port, handle = RCurl::getCurlHandle() ) {
-  xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+  xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
     method = "get_accounts", handle = handle)
 }
 
@@ -73,7 +88,7 @@ restore_deterministic_wallet <- function(wallet_rpc_port, wallet_id, seed, resto
   filename <- paste0(formatC(wallet_id, width = 3, flag = "0"), "_",
     paste0(seed[1:2], collapse = "_"))
 
-  output <- xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+  result <- xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
     method = "restore_deterministic_wallet",
     params = list(
       filename = "spam_wallet",
@@ -88,13 +103,13 @@ restore_deterministic_wallet <- function(wallet_rpc_port, wallet_id, seed, resto
     )
   )
 
-  output
+  result
 }
 
 
 save_wallet <- function(wallet_rpc_port, handle = RCurl::getCurlHandle()) {
   # Save wallet file to storage
-  xmr.rpc(url.rpc = paste0("http://127.0.0.1:", wallet_rpc_port, "/json_rpc"),
+  xmr.rpc(paste0(parse.url.port(wallet_rpc_port), "/json_rpc"),
     method = "store", params = list(), handle = handle)
 }
 
