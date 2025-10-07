@@ -357,6 +357,7 @@ gen.wallet.dir <- function(id, mnemonic_seed) {
 #' @param wallets.data.file wallets.data.file
 #' @param print.json print.json
 #' @param cleanup.process.monero_wallet_rpc cleanup.process.monero_wallet_rpc
+#' @param monero.wallet.rpc.log.level monero.wallet.rpc.log.level
 #'
 #' @returns
 #' 1
@@ -368,7 +369,8 @@ gen.wallets <- function(monerod.rpc.port,
   n.wallets,
   wallets.data.file = "spam_wallets_data.rds",
   print.json = TRUE,
-  cleanup.process.monero_wallet_rpc = FALSE) {
+  cleanup.process.monero_wallet_rpc = FALSE,
+  monero.wallet.rpc.log.level = 0) {
 
   # https://monero.stackexchange.com/questions/11043/how-to-generate-a-monero-wallet-programatically
 
@@ -412,6 +414,7 @@ gen.wallets <- function(monerod.rpc.port,
       paste0("--wallet-dir=", wallets[[id]][["wallet_dir"]]),
       paste0("--daemon-address=", parse.url.port(monerod.rpc.port, rm.http.prefix = TRUE) ),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
+      paste0("--log-level=", monero.wallet.rpc.log.level),
       paste0("--rpc-max-connections=", "1000"),
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
       paste0("--rpc-max-connections-per-private-ip=", "1000"),

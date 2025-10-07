@@ -9,7 +9,8 @@ revive.wallets(
   wallets.data.file = "spam_wallets_data.rds",
   restart.alive.processes = FALSE,
   print.json = FALSE,
-  cleanup.process.monero_wallet_rpc = FALSE
+  cleanup.process.monero_wallet_rpc = FALSE,
+  monero.wallet.rpc.log.level = 0
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ revive.wallets(
 \item{print.json}{print.json}
 
 \item{cleanup.process.monero_wallet_rpc}{cleanup.process.monero_wallet_rpc}
+
+\item{monero.wallet.rpc.log.level}{monero.wallet.rpc.log.level}
 }
 \value{
 1

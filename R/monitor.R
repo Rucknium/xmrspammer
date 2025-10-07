@@ -41,6 +41,7 @@ compare.heights <- function(monerod.rpc.port, monero.wallet.rpc.port,
 #' @param restart.alive.processes restart.alive.processes
 #' @param print.json print.json
 #' @param cleanup.process.monero_wallet_rpc cleanup.process.monero_wallet_rpc
+#' @param monero.wallet.rpc.log.level monero.wallet.rpc.log.level
 #'
 #' @returns
 #' 1
@@ -52,7 +53,8 @@ revive.wallets <- function(monerod.rpc.port,
   wallets.data.file = "spam_wallets_data.rds",
   restart.alive.processes = FALSE,
   print.json = FALSE,
-  cleanup.process.monero_wallet_rpc = FALSE) {
+  cleanup.process.monero_wallet_rpc = FALSE,
+  monero.wallet.rpc.log.level = 0) {
   # if restart.alive.processes, then kill process before restarting it
 
   wallets <- readRDS(wallets.data.file)
@@ -88,6 +90,7 @@ revive.wallets <- function(monerod.rpc.port,
       paste0("--wallet-file=", wallets[[id]][["wallet_dir"]], "/spam_wallet"),
       paste0("--daemon-address=", parse.url.port(monerod.rpc.port, rm.http.prefix = TRUE) ),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
+      paste0("--log-level=", monero.wallet.rpc.log.level),
       paste0("--rpc-max-connections=", "1000"),
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
       paste0("--rpc-max-connections-per-private-ip=", "1000"),
