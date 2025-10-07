@@ -112,6 +112,19 @@ revive.wallets <- function(monerod.rpc.port,
 
   }
 
+
+  all.json <- RJSONIO::toJSON(lapply(wallets, FUN = function(x) {x[["json"]]}),
+    pretty = TRUE)
+
+  cat(all.json, "\n", file = gsub("[.]rds$", ".json", wallets.data.file))
+
+  if (print.json) {
+    cat(all.json, "\n")
+  }
+
+  saveRDS(wallets, file = wallets.data.file)
+
+
   cat("\nWaiting for wallets to finish syncing...\n\n")
   Sys.sleep(10)
 
@@ -142,17 +155,6 @@ revive.wallets <- function(monerod.rpc.port,
     }
 
   }
-
-  all.json <- RJSONIO::toJSON(lapply(wallets, FUN = function(x) {x[["json"]]}),
-    pretty = TRUE)
-
-  cat(all.json, "\n", file = gsub("[.]rds$", ".json", wallets.data.file))
-
-  if (print.json) {
-    cat(all.json, "\n")
-  }
-
-  saveRDS(wallets, file = wallets.data.file)
 
   return(wallets)
 
