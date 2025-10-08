@@ -73,7 +73,7 @@ gen.account.tree.level <- function(wallet_rpc_port, transfer.tree, n.outputs,
 
 
 prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels = 3,
-  fee.priority = c(4, 4, 4), handle = RCurl::getCurlHandle()) {
+  fee.priority = c(4, 4, 4), send.txs = TRUE, handle = RCurl::getCurlHandle()) {
 
   wallet_rpc_port <- wallet[["monero_wallet_rpc_port"]]
   wallet_dir <- wallet[["wallet_dir"]]
@@ -158,6 +158,23 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
       by.x = "to", by.y = "label")
   }
 
+  all_accounts <- get_accounts(wallet_rpc_port, handle = handle)$result
+
+  leaf.accounts <- lapply(all_accounts$subaddress_accounts, FUN = function(x) {
+    data.table(account_index = x[["account_index"]], base_address = x[["base_address"]], label = x[["label"]])
+  })
+
+  leaf.accounts <- data.table::rbindlist(leaf.accounts)
+
+  leaf.accounts <- leaf.accounts[substr(label, 1, 2) ==
+      formatC(n.tree.levels, width = 2, flag = "0"), ]
+
+  if ( ! send.txs) {
+    save_wallet(wallet_rpc_port, handle = handle)
+    return(leaf.accounts)
+    # leaf.accounts is needed for spamming at the leaf level
+  }
+
 
   for (tree_level in seq_len(n.tree.levels)) {
 
@@ -170,18 +187,6 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
       file = paste0(wallet_dir, "/R.log"), append = TRUE)
 
   }
-
-
-  all_accounts <- get_accounts(wallet_rpc_port, handle = handle)$result
-
-  leaf.accounts <- lapply(all_accounts$subaddress_accounts, FUN = function(x) {
-    data.table(account_index = x[["account_index"]], base_address = x[["base_address"]], label = x[["label"]])
-  })
-
-  leaf.accounts <- data.table::rbindlist(leaf.accounts)
-
-  leaf.accounts <- leaf.accounts[substr(label, 1, 2) ==
-      formatC(n.tree.levels, width = 2, flag = "0"), ]
 
 
   wait.for.confirmations <- TRUE
@@ -228,6 +233,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
 #' @param n.outputs n.outputs
 #' @param n.tree.levels n.tree.levels
 #' @param fee.priority fee.priority
+#' @param send.txs send.txs
 #' @param wallets.data.file wallets.data.file
 #'
 #' @returns
@@ -237,7 +243,7 @@ prep.leaves <- function(wallet, wallet_rpc_port, n.outputs = 15, n.tree.levels =
 #' @examples
 #' 1
 prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 15, n.tree.levels = 4,
-  fee.priority = c(3, 3, 3, 0), wallets.data.file = "spam_wallets_data.rds") {
+  fee.priority = c(3, 3, 3, 0), send.txs = TRUE, wallets.data.file = "spam_wallets_data.rds") {
 
   if (is.na(threads)) { threads <- length(wallets) }
   future::plan(future::multisession, workers = threads)
@@ -256,7 +262,8 @@ prep.leaves.wallets <- function(wallets, threads = NA, n.outputs = 15, n.tree.le
   leaf.accounts.wallets <- future.apply::future_lapply(wallets.trimmed,
     FUN = function(wallet) {
     prep.leaves(wallet, n.outputs = n.outputs,
-      n.tree.levels = n.tree.levels, fee.priority = fee.priority)
+      n.tree.levels = n.tree.levels, fee.priority = fee.priority,
+      send.txs = send.txs)
   })
 
   future::plan(future::sequential)

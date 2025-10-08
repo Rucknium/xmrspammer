@@ -10,6 +10,7 @@ prep.leaves.wallets(
   n.outputs = 15,
   n.tree.levels = 4,
   fee.priority = c(3, 3, 3, 0),
+  send.txs = TRUE,
   wallets.data.file = "spam_wallets_data.rds"
 )
 }
@@ -23,6 +24,8 @@ prep.leaves.wallets(
 \item{n.tree.levels}{n.tree.levels}
 
 \item{fee.priority}{fee.priority}
+
+\item{send.txs}{send.txs}
 
 \item{wallets.data.file}{wallets.data.file}
 }
