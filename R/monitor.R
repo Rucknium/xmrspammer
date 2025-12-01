@@ -95,7 +95,8 @@ revive.wallets <- function(monerod.rpc.port,
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
       paste0("--rpc-max-connections-per-private-ip=", "1000"),
       "--password=password",
-      "--trusted-daemon", "--disable-rpc-ban", "--disable-rpc-login"
+      "--trusted-daemon", "--disable-rpc-ban", "--disable-rpc-login",
+      "--no-initial-sync"
     )
     # Separate args into elements in a vector. No spaces. Use "=" instead of space.
 
