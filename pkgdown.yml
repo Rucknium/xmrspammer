@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-12-01T19:52Z
+last_built: 2025-12-03T20:48Z
 urls:
   reference: https://rucknium.github.io/xmrspammer/reference
   article: https://rucknium.github.io/xmrspammer/articles
