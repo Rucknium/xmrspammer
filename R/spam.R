@@ -27,18 +27,22 @@ spam.1in.2out <- function(wallet, fee.priority = 1,
       keep.trying.rpc = TRUE, handle = handle)
 
     if (length(sweep.result$error) > 0) {
-      cat(paste0(base::date(),
-        " Account: ", leaf_accounts[row.iter, label],
-        " Error: ", sweep.result$error, "\n"),
-        file = paste0(wallet_dir, "/R.log"), append = TRUE)
+      try(
+        cat(paste0(base::date(),
+          " Account: ", leaf_accounts[row.iter, label],
+          " Error: ", sweep.result$error, "\n"),
+          file = paste0(wallet_dir, "/R.log"), append = TRUE)
+      )
 
     } else {
-      cat(paste0(base::date(),
-        " Account: ", leaf_accounts[row.iter, label],
-        " Amount: ", formatC(unlist(sweep.result$result$amount_list) / 1e+12, digits = 8, format = "fg", flag = "#"),
-        " Fee: ", formatC(unlist(sweep.result$result$fee_list) / 1e+12, digits = 8, format = "fg", flag = "#"),
-        " tx_hash: ", unlist(sweep.result$result$tx_hash_list), "\n"),
-        file = paste0(wallet_dir, "/R.log"), append = TRUE)
+      try(
+        cat(paste0(base::date(),
+          " Account: ", leaf_accounts[row.iter, label],
+          " Amount: ", formatC(unlist(sweep.result$result$amount_list) / 1e+12, digits = 8, format = "fg", flag = "#"),
+          " Fee: ", formatC(unlist(sweep.result$result$fee_list) / 1e+12, digits = 8, format = "fg", flag = "#"),
+          " tx_hash: ", unlist(sweep.result$result$tx_hash_list), "\n"),
+          file = paste0(wallet_dir, "/R.log"), append = TRUE)
+      )
     }
 
     if (length(sweep.result$result$spent_key_images_list[[1]]$key_images) > 1) {
