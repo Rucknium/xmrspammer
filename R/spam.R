@@ -45,7 +45,12 @@ spam.1in.2out <- function(wallet, fee.priority = 1,
       )
     }
 
-    if (length(sweep.result$result$spent_key_images_list[[1]]$key_images) > 1) {
+    key_images.length <- tryCatch(length(sweep.result$result$spent_key_images_list[[1]]$key_images), error = function(e) {1} )
+    # Sometimes have error:
+    # Error in sweep.result$result$spent_key_images_list :
+    # $ operator is invalid for atomic vectors
+
+    if (key_images.length > 1) {
       # If multiple outputs are being spent, wait longer
       Sys.sleep(1)
 
