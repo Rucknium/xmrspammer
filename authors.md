@@ -7,14 +7,14 @@
 
 ## Citation
 
-Rucknium (2025). *xmrspammer: Create high volume of spam Monero
-transactions*. R package version 0.2.4,
+Rucknium (2026). *xmrspammer: Create high volume of spam Monero
+transactions*. R package version 0.2.5,
 <https://rucknium.github.io/xmrspammer/>.
 
     @Manual{,
       title = {xmrspammer: Create high volume of spam Monero transactions},
       author = {{Rucknium}},
-      year = {2025},
-      note = {R package version 0.2.4},
+      year = {2026},
+      note = {R package version 0.2.5},
       url = {https://rucknium.github.io/xmrspammer/},
     }

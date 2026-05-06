@@ -13,6 +13,7 @@ You can install the development version of `xmrspammer` from
 `curl` installed on your system with:
 
 ``` r
+
 install.packages("remotes")
 remotes::install_github("Rucknium/xmrspammer", upgrade = FALSE)
 ```
@@ -98,6 +99,7 @@ Start a new R instance in a terminal in the working directory. Use
 you have installed `xmrspammer`, load the package into the workspace:
 
 ``` r
+
 library(xmrspammer)
 ```
 
@@ -107,6 +109,7 @@ node’s restricted RPC port available at 28089. We will create one wallet
 for this test.
 
 ``` r
+
 wallets <- gen.wallets(monerod.rpc.port = 28089, n.wallets = 1)
 ```
 
@@ -114,6 +117,7 @@ A single `monero-wallet-rpc` process should have launched to manage the
 single wallet we created. Check that the process is alive:
 
 ``` r
+
 wallets[[1]]$monero_wallet_rpc_process$is_alive()
 ```
 
@@ -127,6 +131,7 @@ argument to specify the total amount of XMR you will send to the
 spamming wallet(s).
 
 ``` r
+
 fund.wallets(wallets, amount = 30)
 ```
 
@@ -149,6 +154,7 @@ slowing down this step in the process. We will choose fee priority 4 for
 all tree levels so that the accounts are built as quickly as possible.
 
 ``` r
+
 wallets <- prep.leaves.wallets(wallets, n.outputs = 15,
   n.tree.levels = 3, fee.priority = c(4, 4, 4))
 ```
@@ -160,6 +166,7 @@ Finally, start the spamming. The next line will initiate an infinite
 loop. Input `ctrl + c` to interrupt the spamming loop if desired.
 
 ``` r
+
 spam.1in.2out.wallets(wallets)
 ```
 
@@ -170,18 +177,21 @@ you started the original R session. It should have some files and
 subdirectories by now. Remember to load the package into the workspace:
 
 ``` r
+
 library(xmrspammer)
 ```
 
 Now load the wallet data into the workspace:
 
 ``` r
+
 wallets <- readRDS("spam_wallets_data.rds")
 ```
 
 Get some status information about the wallet:
 
 ``` r
+
 wallets.status(wallets, get_balance = TRUE)
 ```
 
@@ -210,6 +220,7 @@ Open a new R session in the directory where the wallet files are
 located. Load the package:
 
 ``` r
+
 library(xmrspammer)
 ```
 
@@ -218,6 +229,7 @@ Then use the
 function to gain control of the wallets:
 
 ``` r
+
 wallets <- revive.wallets(monerod.rpc.port = 28089)
 ```
 
@@ -226,12 +238,14 @@ If `28089` is not your `monerod`’s RPC port, change it.
 You can check the wallet status:
 
 ``` r
+
 wallets.status(wallets, get_balance = TRUE)
 ```
 
 And start spamming again:
 
 ``` r
+
 spam.1in.2out.wallets(wallets)
 ```
 
@@ -244,6 +258,7 @@ already running. To quit all `monero-wallet-rpc` processes and restart a
 fresh `monero-wallet-rpc` process for every wallet, input this:
 
 ``` r
+
 wallets <- revive.wallets(monerod.rpc.port = 28089,
   restart.alive.processes = TRUE)
 ```
