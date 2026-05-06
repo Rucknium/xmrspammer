@@ -189,7 +189,7 @@ wallets.status <- function(wallets, get_balance = FALSE, log.lines = 2) {
     R.log.file <- paste0(x[["wallet_dir"]], "/R.log")
     total.log.n.lines <- LaF::determine_nlines(R.log.file)
     log.text <- LaF::get_lines(R.log.file,
-      (total.log.n.lines - log.lines + 1):total.log.n.lines)
+      max(c(1, total.log.n.lines - log.lines + 1)):total.log.n.lines)
 
     if (get_balance) {
       balance <- xmr.rpc(url.rpc = paste0(
