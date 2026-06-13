@@ -54,8 +54,10 @@ revive.wallets <- function(monerod.rpc.port,
   restart.alive.processes = FALSE,
   print.json = FALSE,
   cleanup.process.monero_wallet_rpc = FALSE,
-  monero.wallet.rpc.log.level = 0) {
+  monero.wallet.rpc.log.level = 0,
+  monero.wallet.rpc.max.log.files = 100) {
   # if restart.alive.processes, then kill process before restarting it
+  # --max-log-file original default is 10. If set to 0, it is unlimited.
 
   wallets <- readRDS(wallets.data.file)
 
@@ -91,6 +93,7 @@ revive.wallets <- function(monerod.rpc.port,
       paste0("--daemon-address=", parse.url.port(monerod.rpc.port, rm.http.prefix = TRUE) ),
       paste0("--log-file=", wallets[[id]][["wallet_dir"]], "/monero-wallet-rpc.log"),
       paste0("--log-level=", monero.wallet.rpc.log.level),
+      paste0("--max-log-files=", monero.wallet.rpc.max.log.files),
       paste0("--rpc-max-connections=", "1000"),
       paste0("--rpc-max-connections-per-public-ip=", "1000"),
       paste0("--rpc-max-connections-per-private-ip=", "1000"),
